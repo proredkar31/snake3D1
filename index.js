@@ -9,12 +9,20 @@ var renderer = new THREE.WebGLRenderer(),
 
 var controls = new THREE.OrbitControls(camera, renderer.domElement);
 var clock = new THREE.Clock(), 
-    text = document.createElement("div");
+    text = document.getElementById("div");
+var delta=0    
     //detail=document.getElementsByClassName("detail");
 controls.enableKeys = false;
 
+function sliderFunc(){
+    var value=document.getElementById("slide").value;
+    document.getElementById("value").innerHTML=value+"X";
+    value=(10-value)/10;
+    delta = value / mov;
+}
+
 var mov = 5;
-var delta = 1 / mov;
+
 var tetha = 0.0, edgeSize = 20, padding = 0.15;
 var cubeSize = edgeSize + (edgeSize - 1) * padding;
 var halfCubeSize = cubeSize/2;
@@ -30,12 +38,14 @@ var cube = new THREE.BoxGeometry( 1, 1, 1 );
 var gameCube = new THREE.BoxGeometry( cubeSize, cubeSize, cubeSize );
 var direction = new THREE.Vector3(1, 0, 0);
 
+var sphereGeometry = new THREE.SphereGeometry( 0.75, 10, 10 );
 
 scene.background = new THREE.Color( BACKGROUND_COLOR );
 
 camera.position.z = 30;
 camera.position.y = 30;
 
+sphereGeometry.center();
 cube.center();
 
 function init(){
@@ -58,11 +68,18 @@ function init(){
                     (i + i * padding) -halfCubeSize + 0.5 , 0.5 + padding / 2, 0.5 + padding / 2 ), snakeCubeMaterial, scene));
     }
 
-    var appleCubeMaterial = new THREE.MeshPhongMaterial( { color: 0xd64161} );
-    apple = new Cube(spawnAppleVector(), appleCubeMaterial, scene);
-    var edgesMaterial = new THREE.LineBasicMaterial( { color: 0x50394c } );
+    var appleSphereMaterial = new THREE.MeshLambertMaterial( { color: 0xd64161} );
+    apple = new Sphere(spawnAppleVector(), appleSphereMaterial, scene);
+    //var edgesMaterial = new THREE.LineBasicMaterial( { color: 0x50394c } );
+    var sphereMaterial= new THREE.MeshBasicMaterial( {color: 0x50394c} );
+    new Sphere(new THREE.Vector3(0,0,0), sphereMaterial, scene, sphereGeometry, true).setPosition(0,0,0);
+
+    //var appleCubeMaterial = new THREE.MeshPhongMaterial( { color: 0xc62828} );
+    //apple = new Cube(spawnAppleVector(), appleCubeMaterial, scene);
+    var edgesMaterial = new THREE.LineBasicMaterial( { color: 0xffffff } );
     new Cube(new THREE.Vector3(0,0,0), edgesMaterial, scene, gameCube, true).setPosition(0,0,0);
 
+    
     text.style.position = "absolute";
     text.style.width = 200;
     text.style.height = 100;
@@ -80,6 +97,42 @@ function init(){
     clock.startTime = 0.0;
     render();
 }
+
+function Sphere(vec, material, scene, geometry, renderWireframe){
+    this.geometry = typeof geometry === 'undefined' ? sphereGeometry : geometry;
+    this.mesh = new THREE.Mesh(this.geometry, material);
+
+    if(typeof renderWireframe === 'undefined' || !renderWireframe){
+        this.mesh.position.set(vec.x, vec.y, vec.z);
+        scene.add(this.mesh);
+    }
+    else {
+       
+    }
+
+    this.setPosition = function(vec){
+        this.mesh.position.set(vec.x, vec.y, vec.z);
+    };
+}   
+
+function Cube(vec, material, scene, geometry, renderWireframe){
+this.geometry = typeof geometry === 'undefined' ? cube : geometry;
+this.mesh = new THREE.Mesh(this.geometry, material);
+
+if(typeof renderWireframe === 'undefined' || !renderWireframe){
+    this.mesh.position.set(vec.x, vec.y, vec.z);
+    scene.add(this.mesh);
+}
+else {
+    var edges = new THREE.EdgesGeometry( this.mesh.geometry );
+    scene.add(new THREE.LineSegments( edges, material ));
+}
+
+this.setPosition = function(vec){
+    this.mesh.position.set(vec.x, vec.y, vec.z);
+};
+}   
+
 
 function restart(){
     while(snake.length > 5) scene.remove(snake.shift().mesh);
@@ -105,23 +158,6 @@ function spawnAppleVector(){
     return new THREE.Vector3(x + x*padding -halfCubeSize + 0.5, y + y * padding -halfCubeSize + 0.5, z + z * padding -halfCubeSize + 0.5);
 }
 
-function Cube(vec, material, scene, geometry, renderWireframe){
-    this.geometry = typeof geometry === 'undefined' ? cube : geometry;
-    this.mesh = new THREE.Mesh(this.geometry, material);
-
-    if(typeof renderWireframe === 'undefined' || !renderWireframe){
-        this.mesh.position.set(vec.x, vec.y, vec.z);
-        scene.add(this.mesh);
-    }
-    else {
-        var edges = new THREE.EdgesGeometry( this.mesh.geometry );
-        scene.add(new THREE.LineSegments( edges, material ));
-    }
-
-    this.setPosition = function(vec){
-        this.mesh.position.set(vec.x, vec.y, vec.z);
-    };
-}   
 
 function randInRange(a, b){
     return a + Math.floor((b - a) * Math.random());
