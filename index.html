@@ -12,12 +12,27 @@
         background-color: #deeaee;
 
     }
-    
+    .slider{
+        margin-left: 600px;
+        margin-top: 50px;
+    }
+    .speed{
+        font-family:verdana;
+    }
     </style>
 </head>
 <body>
+    <div id="div"></div>
+    <div id="slider" class="slider">
+        <label class="speed">SPEED</label>
+        <input type="range" id="slide" value="10" min="0" max="10" 
+               oninput="sliderFunc()" />
+        <label id="value" style="padding-left:20px;">10X</label>
+      </div>
     <script src="./three.js"></script>
     <script src="./OrbitControls.js"></script>
     <script src="./index.js"></script>
+
+    
 </body>
 </html>
