@@ -106,9 +106,9 @@ function Sphere(vec, material, scene, geometry, renderWireframe){
         this.mesh.position.set(vec.x, vec.y, vec.z);
         scene.add(this.mesh);
     }
-    else {
+   // else {
        
-    }
+   // }
 
     this.setPosition = function(vec){
         this.mesh.position.set(vec.x, vec.y, vec.z);
